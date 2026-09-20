@@ -1,1 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かんたん投稿シミュレーター｜処理・保存・共有を体験しよう</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<header class="app-header">
+  <div class="app-header__inner">
+    <p class="app-header__badge">情報Ⅰ ｜ ネットワークの授業</p>
+    <h1 class="app-header__title">📮 かんたん投稿シミュレーター</h1>
+    <p class="app-header__subtitle">ボタン1つで投稿できるSNS。その裏側で起きている「処理・保存・共有」を体験しよう。</p>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- ================= 投稿作成ビュー ================= -->
+  <section id="composeView" class="view">
+
+    <p class="howto">左のスマホで、画像とコメントを選んで「投稿する」を押してみよう。裏側で何が起きているかは、右側で確認できます。</p>
+
+    <div class="reveal-control">
+      <label class="switch">
+        <input type="checkbox" id="revealToggle">
+        <span class="switch__track"><span class="switch__thumb"></span></span>
+        <span class="switch__label">裏側のフローチャートを表示する</span>
+      </label>
+    </div>
+
+    <div class="demo-grid" id="demoGrid">
+
+      <!-- 左：スマホ枠 -->
+      <div class="phone-frame">
+        <div class="phone-frame__notch"></div>
+        <div class="phone-screen">
+
+          <form id="postForm" class="composer">
+            <div class="field">
+              <span class="field__label">画像を選ぶ</span>
+              <div class="image-picker" id="imagePicker" role="group" aria-label="画像を選ぶ">
+                <button type="button" class="image-picker__item" data-emoji="📷" aria-pressed="false"><span class="image-picker__emoji">📷</span></button>
+                <button type="button" class="image-picker__item" data-emoji="🌸" aria-pressed="false"><span class="image-picker__emoji">🌸</span></button>
+                <button type="button" class="image-picker__item" data-emoji="🍜" aria-pressed="false"><span class="image-picker__emoji">🍜</span></button>
+                <button type="button" class="image-picker__item" data-emoji="🐶" aria-pressed="false"><span class="image-picker__emoji">🐶</span></button>
+                <button type="button" class="image-picker__item" data-emoji="🌇" aria-pressed="false"><span class="image-picker__emoji">🌇</span></button>
+                <button type="button" class="image-picker__item" data-emoji="🎨" aria-pressed="false"><span class="image-picker__emoji">🎨</span></button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="commentInput">コメント（20文字まで）</label>
+              <input type="text" id="commentInput" class="text-input" maxlength="40" placeholder="今日の出来事を書いてみよう">
+            </div>
+
+            <button type="submit" id="submitBtn" class="post-btn" disabled>投稿する</button>
+          </form>
+
+          <div class="phone-status" id="phoneStatus" hidden>
+            <div class="spinner" id="spinner"></div>
+            <p class="phone-status__text" id="phoneStatusText"></p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 右：外側のフローチャート -->
+      <div class="flow-panel" id="flowPanel">
+        <p class="flow-panel__title">裏側の流れ</p>
+        <div class="flow-track">
+
+          <div class="flow-node" data-node="data">
+            <span class="flow-node__circle">📝</span>
+            <span class="flow-node__label">投稿データ</span>
+            <p class="flow-node__caption"></p>
+          </div>
+          <div class="flow-arrow"></div>
+
+          <div class="flow-node" data-node="process">
+            <span class="flow-node__circle">①</span>
+            <span class="flow-node__label">処理</span>
+            <p class="flow-node__caption"></p>
+          </div>
+          <div class="flow-arrow"></div>
+
+          <div class="flow-node" data-node="save">
+            <span class="flow-node__circle">②</span>
+            <span class="flow-node__label">保存</span>
+            <p class="flow-node__caption"></p>
+          </div>
+          <div class="flow-arrow"></div>
+
+          <div class="flow-node" data-node="share">
+            <span class="flow-node__circle">③</span>
+            <span class="flow-node__label">共有</span>
+            <p class="flow-node__caption"></p>
+          </div>
+          <div class="flow-arrow"></div>
+
+          <div class="flow-node" data-node="friend">
+            <span class="flow-node__circle">📱</span>
+            <span class="flow-node__label">相手の画面</span>
+            <p class="flow-node__caption"></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="result" id="result" hidden></div>
+
+    <section class="my-posts">
+      <div class="my-posts__head">
+        <h2>📱 この端末に保存されている投稿</h2>
+        <button type="button" id="resetBtn" class="reset-btn">ぜんぶ消す</button>
+      </div>
+      <p class="my-posts__hint">投稿は「保存」の処理によって、この端末（ブラウザ）の中に残ります。リロードしても消えません。</p>
+      <div class="post-list" id="postList"></div>
+    </section>
+
+  </section>
+
+  <!-- ================= 共有リンクから開いた時のビュー ================= -->
+  <section id="receivedView" class="view" hidden>
+    <div class="received-card">
+      <p class="received-card__badge">🎉 共有リンクから届きました</p>
+      <div class="received-card__post" id="receivedPost"></div>
+      <p class="received-note">
+        このアプリにはサーバーがありませんが、投稿を表示できました。それは、送られてきた<strong>リンクの中に投稿の情報そのものが入っていた</strong>からです。
+      </p>
+      <button type="button" id="backToComposeBtn" class="post-btn post-btn--ghost">自分でも投稿を作ってみる</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  <p>このアプリは GitHub Pages 上だけで動作しています（サーバーなし・データベースなし）。</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
